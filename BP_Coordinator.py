@@ -14,7 +14,7 @@ def num_players(m):
                 else:
                     print("You need at least three players.")
             if m == 1:  # DUO CashCup selected
-                x = int(input("Enter an even number of players greater or equal than four: "))
+                x = int(input("Enter an even number of players greater or equal than six: "))
                 if x <= 0:
                     print("You must enter a positive number of players.")
                 elif x >= 6:
@@ -61,6 +61,7 @@ def mode():
             print("Invalid input! Input must be 's' or 'd.")
             
 def draw_teams(player_names):
+    
     if len(player_names) % 2 != 0 or len(player_names) < 4:
         print("The number of players is not ideal! Could not create proper teams.")
     
@@ -76,11 +77,15 @@ def draw_teams(player_names):
     print("****************TEAMS****************")
     for i, team in enumerate(teams):
         print(f"Team {i + 1}: {', '.join(team)}")
-        
-        # Abfrage der Teamnamen nach Auswahl der Teammitglieder
+
     for i, team in enumerate(teams):
-        team_name = input(f"Enter the name for {team}: ")
-        team_names[team_name] = team
+        while True:
+            team_name = input(f"Enter the name for Team {i + 1}: ")
+            if team_name not in team_names:
+                team_names[team_name] = team
+                break
+            else:
+                print("Team name already exists. Please choose a different name.")
         
     return team_names
 
