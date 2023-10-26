@@ -8,23 +8,23 @@ def num_players(m):
                 x = int(input("Enter number of players: "))
                 if x <= 0:
                     print("You must enter a positive number of players.")
-                elif x >= 2:
+                elif x >= 3:
                     print(f"You have entered {x} players.")
                     return x
                 else:
-                    print("You need at least two players.")
+                    print("You need at least three players.")
             if m == 1:  # DUO CashCup selected
                 x = int(input("Enter an even number of players greater or equal than four: "))
                 if x <= 0:
                     print("You must enter a positive number of players.")
-                elif x >= 4:
+                elif x >= 6:
                     if x % 2 != 0:
                         print("You must enter an even number of players")
                     else:
                         print(f"You have entered {x} players.")
                         return x
                 else:
-                    print("You need at least four players.")
+                    print("You need at least six players.")
         except ValueError:
             print("Invalid input! Please enter a valid number of players.")
 
@@ -60,19 +60,32 @@ def mode():
         else:
             print("Invalid input! Input must be 's' or 'd.")
             
-def draw_teams(p):
-    if len(p) % 2 != 0 or len(p)<4:
+def draw_teams(player_names):
+    if len(player_names) % 2 != 0 or len(player_names) < 4:
         print("The number of players is not ideal! Could not create proper teams.")
-        
-    random.shuffle(p)
-    num_teams=len(p)//2
-    teams=[]
-    for i in range(num_teams):
-        team=p[i*2:(i+1)*2]
+    
+    teams = []
+    
+
+    team_names = {}
+    for i in range(len(player_names) // 2):
+        team = [player_names[i * 2], player_names[i * 2 + 1]]
         teams.append(team)
+
+        # Ausgabe der Teams mit Spielernamen
+    print("****************TEAMS****************")
     for i, team in enumerate(teams):
-        print(f"Team {i + 1}: {team}")
-    return teams
+        print(f"Team {i + 1}: {', '.join(team)}")
+        
+        # Abfrage der Teamnamen nach Auswahl der Teammitglieder
+    for i, team in enumerate(teams):
+        team_name = input(f"Enter the name for Team {i + 1}: ")
+        team_names[team_name] = team
+        
+    return team_names
+
+
+
 
 
 def create_groupstage(arr):
@@ -80,7 +93,7 @@ def create_groupstage(arr):
     if n <= 5:
         # Wenn die Liste klein genug ist, gib einzelne Gruppe zurück
         return [arr]
-
+    
     num_groups = (n + 4) // 5  # Berechne Anzahl der Gruppen
     group_size = (n + num_groups - 1) // num_groups  # durchschnittliche Gruppengröße.
 
@@ -98,11 +111,12 @@ def create_groupstage(arr):
         for item in last_group:
             index = np.argmin([len(group) for group in groups])
             groups[index].append(item)
-
+            
     return groups
-    
-      
-        
+
+#MAIN
+
+
 mode_select = mode()
 num_of_players = num_players(mode_select)
 player_names=names(num_of_players)
@@ -113,7 +127,6 @@ if mode_select==1:
     
 else:
     result=create_groupstage(player_names)
-    print(player_names)
-      
+  
 for i, group in enumerate(result):
     print(f"Gruppe {i + 1}: {group}")
