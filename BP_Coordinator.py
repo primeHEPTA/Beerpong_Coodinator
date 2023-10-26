@@ -79,7 +79,7 @@ def draw_teams(player_names):
         
         # Abfrage der Teamnamen nach Auswahl der Teammitglieder
     for i, team in enumerate(teams):
-        team_name = input(f"Enter the name for Team {i + 1}: ")
+        team_name = input(f"Enter the name for {team}: ")
         team_names[team_name] = team
         
     return team_names
