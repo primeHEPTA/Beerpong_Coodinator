@@ -97,7 +97,7 @@ def create_groupstage(arr):
     n = len(arr)
     if n <= 5:
         # Wenn die Liste klein genug ist, gib einzelne Gruppe zurück
-        return [arr]
+        return group_names,[arr]
     
     num_groups = (n + 4) // 5  # Berechne Anzahl der Gruppen
     group_size = (n + num_groups - 1) // num_groups  # durchschnittliche Gruppengröße.
@@ -116,22 +116,60 @@ def create_groupstage(arr):
         for item in last_group:
             index = np.argmin([len(group) for group in groups])
             groups[index].append(item)
-            
-    return groups
+    group_names = [f"Group{i + 1}" for i in range(len(groups))]       
+    return groups, group_names 
 
-#MAIN
+def create_gameplan(groups):
+    num_groups = len(groups)
+    num_teams_per_group = max(len(group) for group in groups)
+    num_playdays = num_teams_per_group - 1 if num_teams_per_group % 2 == 0 else num_teams_per_group
 
+    gameplan = []
+    played_matches = set()  # Verfolgen der bereits gespielten Spiele
 
-mode_select = mode()
-num_of_players = num_players(mode_select)
-player_names=names(num_of_players)
+    for playday in range(1, num_playdays + 1):
+        playday_matches = []
+        played_teams = set()
 
-if mode_select==1:              
-    teams=draw_teams(player_names)  #Draw Teams for Duo CashCup if Duo mode was selected
-    result=create_groupstage(teams)
-    
-else:
-    result=create_groupstage(player_names)
-  
-for i, group in enumerate(result):
-    print(f"Gruppe {i + 1}: {group}")
+        for group in groups:
+            for i, team in enumerate(group):
+                if team not in played_teams:
+                    available_opponents = [x for x in group if x != team and x not in played_teams]
+                    if available_opponents:
+                        opponent = available_opponents[0]
+                        match = (team, opponent)
+
+                        # Überprüfen, ob dieses Spiel bereits gespielt wurde
+                        if (team, opponent) not in played_matches and (opponent, team) not in played_matches:
+                            playday_matches.append(match)
+                            played_teams.add(team)
+                            played_teams.add(opponent)
+                            played_matches.add(match)
+
+        if playday_matches:
+            gameplan.append(f"Spieltag {playday}: {playday_matches}")
+
+        # Teams aussetzen
+        for group in groups:
+            if len(group) % 2 == 0:
+                group.append(group.pop(1))  # Verschiebe das zweite Team an das Ende
+            else:
+                group.insert(1, group.pop(-1))  # Verschiebe das letzte Team an die zweite Position
+
+        if playday == num_playdays - 1:
+            # Teams, die ausgesetzt haben, spielen am vorletzten Spieltag untereinander
+            final_playday_matches = []
+            for group in groups:
+                for i, team in enumerate(group):
+                    for j in range(i + 1, len(group)):
+                        opponent = group[j]
+                        match = (team, opponent)
+                        if match not in played_matches and (opponent, team) not in played_matches:
+                            final_playday_matches.append(match)
+            if final_playday_matches:
+                gameplan.append(f"Spieltag {num_playdays}: {final_playday_matches}")
+
+            # Kein weiterer Spieltag erforderlich
+            break
+
+    return gameplan
