@@ -66,9 +66,8 @@ def draw_teams(player_names):
         print("The number of players is not ideal! Could not create proper teams.")
     
     teams = []
+    team_names = []
     
-
-    team_names = {}
     for i in range(len(player_names) // 2):
         team = [player_names[i * 2], player_names[i * 2 + 1]]
         teams.append(team)
@@ -82,11 +81,11 @@ def draw_teams(player_names):
         while True:
             team_name = input(f"Enter the name for Team {i + 1}: ")
             if team_name not in team_names:
-                team_names[team_name] = team
+                team_names.append(team_name)
                 break
             else:
                 print("Team name already exists. Please choose a different name.")
-        
+
     return team_names
 
 
@@ -97,7 +96,8 @@ def create_groupstage(arr):
     n = len(arr)
     if n <= 5:
         # Wenn die Liste klein genug ist, gib einzelne Gruppe zurück
-        return group_names,[arr]
+        group_names=["Group1"]
+        return [arr], group_names
     
     num_groups = (n + 4) // 5  # Berechne Anzahl der Gruppen
     group_size = (n + num_groups - 1) // num_groups  # durchschnittliche Gruppengröße.
@@ -123,7 +123,8 @@ def create_gameplan(groups):
     num_groups = len(groups)
     num_teams_per_group = max(len(group) for group in groups)
     num_playdays = num_teams_per_group - 1 if num_teams_per_group % 2 == 0 else num_teams_per_group
-
+    
+    playdaymatches_list=[]
     gameplan = []
     played_matches = set()  # Verfolgen der bereits gespielten Spiele
 
@@ -145,10 +146,10 @@ def create_gameplan(groups):
                             played_teams.add(team)
                             played_teams.add(opponent)
                             played_matches.add(match)
-
+        
         if playday_matches:
             gameplan.append(f"Spieltag {playday}: {playday_matches}")
-
+            playdaymatches_list.append(playday_matches)
         # Teams aussetzen
         for group in groups:
             if len(group) % 2 == 0:
@@ -168,8 +169,8 @@ def create_gameplan(groups):
                             final_playday_matches.append(match)
             if final_playday_matches:
                 gameplan.append(f"Spieltag {num_playdays}: {final_playday_matches}")
-
+                playdaymatches_list.append(final_playday_matches)
             # Kein weiterer Spieltag erforderlich
             break
 
-    return gameplan
+    return gameplan, playdaymatches_list
