@@ -1,5 +1,7 @@
 import random
 import numpy as np
+import datetime
+import pickle
 
 def num_players(m):
     while True:
@@ -88,10 +90,6 @@ def draw_teams(player_names):
 
     return team_names
 
-
-
-
-
 def create_groupstage(arr):
     n = len(arr)
     if n <= 5:
@@ -158,7 +156,7 @@ def create_gameplan(groups):
                 group.insert(1, group.pop(-1))  # Verschiebe das letzte Team an die zweite Position
 
         if playday == num_playdays - 1:
-            # Teams, die ausgesetzt haben, spielen am vorletzten Spieltag untereinander
+            # Teams, die ausgesetzt haben, spielen am letzten Spieltag untereinander
             final_playday_matches = []
             for group in groups:
                 for i, team in enumerate(group):
@@ -174,3 +172,28 @@ def create_gameplan(groups):
             break
 
     return gameplan, playdaymatches_list
+
+
+def save_tournament_data(tournament, loaded,filename):
+    if loaded==False:
+            #datetime soll nur einmal pro programmdurchlauf ermittelt werden
+        current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = f"_tournaments/Tournament_{current_datetime}.dat"
+    else:
+        filename=filename
+    
+    with open(filename, "wb") as file:
+        pickle.dump(tournament, file)
+    return filename
+
+def load_tournament_data(filename):
+    try:
+        with open(filename, "rb") as file:
+            tournament = pickle.load(file)
+        return tournament
+    except FileNotFoundError:
+        print(f" '{filename}' not found.")
+        return None
+    except Exception as e:
+        print(f"Error while loading data: {str(e)}")
+        return filename
