@@ -1,7 +1,6 @@
 from setup_phase import create_gameplan, create_groupstage, draw_teams, names, num_players, mode, save_tournament_data, load_tournament_data
 from tournament_class import Tournament
-from itertools import zip_longest
-#from get_groupname import Tournament
+
 def get_group_name(teams):
     
     groups=tournament.groups
