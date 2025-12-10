@@ -38,6 +38,8 @@ def names(x):
             name = input(f"Enter the name of player {i + 1}: ")
             if name in player_names:
                 print("Name already exists. Please choose a different name.")
+            if 'none' in name.strip().lower() or name=='':
+                print("Invalid name!Choose a different name")
             else:
                 player_names.append(name)
                 break
@@ -50,6 +52,7 @@ def names(x):
             print(f"Player {i + 1}: {name}")
         random.shuffle(player_names)
         return player_names
+
 def mode():
     while True:
         m = input("Choose between solo (s) or duo (d) CashCup: ")
@@ -69,6 +72,8 @@ def draw_teams(player_names):
     
     teams = []
     team_names = []
+    team_dic={}
+    
     
     for i in range(len(player_names) // 2):
         team = [player_names[i * 2], player_names[i * 2 + 1]]
@@ -87,8 +92,9 @@ def draw_teams(player_names):
                 break
             else:
                 print("Team name already exists. Please choose a different name.")
-
-    return team_names
+    team_dic=dict(zip(team_names,teams))
+    print(team_dic)
+    return team_names,team_dic
 
 def create_groupstage(arr):
     n = len(arr)
@@ -173,27 +179,26 @@ def create_gameplan(groups):
 
     return gameplan, playdaymatches_list
 
-
-def save_tournament_data(tournament, loaded,filename):
-    if loaded==False:
-            #datetime soll nur einmal pro programmdurchlauf ermittelt werden
-        current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        filename = f"_tournaments/Tournament_{current_datetime}.dat"
-    else:
-        filename=filename
+def save_tournament_data(tournament,filename):
     
     with open(filename, "wb") as file:
         pickle.dump(tournament, file)
     return filename
 
-def load_tournament_data(filename):
-    try:
-        with open(filename, "rb") as file:
-            tournament = pickle.load(file)
-        return tournament
-    except FileNotFoundError:
-        print(f" '{filename}' not found.")
-        return None
-    except Exception as e:
-        print(f"Error while loading data: {str(e)}")
-        return filename
+def load_tournament_data():
+    while True:
+        filename = input("Enter the name of the file to load: ").strip()
+
+        try:
+            with open(filename, "rb") as file:
+                tournament = pickle.load(file)
+            return tournament,filename
+        except FileNotFoundError:
+            print(f" '{filename}' not found. Please enter a valid file name.")
+        except pickle.PickleError as pe:
+            print(f"Error while loading/pickling data: {str(pe)}")
+
+def generate_filename(extension="dat"):
+    current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    filename = f"_tournaments/Tournament_{current_datetime}.{extension}"
+    return filename
